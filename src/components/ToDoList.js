@@ -38,7 +38,7 @@ export default function ToDoList({ handleAdd }) {
 
     useEffect(() => {
         console.log("calling useEffect");
-        const storageTodos = JSON.parse(localStorage.getItem("Task"));
+        const storageTodos = JSON.parse(localStorage.getItem("Task")) ?? [];
         if (storageTodos) {
             setTask(storageTodos);
         }
