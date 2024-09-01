@@ -2,7 +2,7 @@
   "name": "to_do_list",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://Ahmedtell.github.io/Todo-List-App",
+  "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
@@ -19,7 +19,7 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy" : "gh-paged -d build ",
+    
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -44,6 +44,6 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.1.1"
+  
   }
 }
