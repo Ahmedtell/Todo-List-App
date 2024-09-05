@@ -8,23 +8,15 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { TodosContext } from '../contexts/TodosContext';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
 
 
-export default function ToDo({ todo }) {
-    const [deleteDialog, setDeleteDialog] = useState(false);
-    const [editDialog, setEditDialog] = useState(false);
-    const [updatedTaskContent, setUpdatedTaskContent] = useState({ title: todo.title, details: todo.details });
+
+export default function ToDo({ todo, showDeleteDialog, showEditClick }) {
 
 
+    // const [updatedTaskContent, setUpdatedTaskContent] = useState({ title: todo.title, details: todo.details });
     const { task, setTask } = useContext(TodosContext);
 
     function handleCheckClick() {
@@ -49,103 +41,20 @@ export default function ToDo({ todo }) {
         localStorage.setItem("Task", JSON.stringify(importantTask));
     }
 
+
     function handleDeleteClick() {
-        setDeleteDialog(true);
-    }
-
-    function deleteConfirm() {
-        let updatedTasks = task.filter((element) => element.id !== todo.id);
-        setTask(updatedTasks);
-        setDeleteDialog(false);
-        localStorage.setItem("Task", JSON.stringify(updatedTasks));
-    }
-
-    function handleCloseDeleteDialog() {
-        setDeleteDialog(false);
+        showDeleteDialog(todo);
     }
 
     function handleEditClick() {
-        setEditDialog(true);
+        showEditClick(todo);
     }
 
-    function handleCloseEditDialog() {
-        setEditDialog(false);
-    }
 
-    function handleUpdatedTask() {
-        let updatedTask = task.map((element) =>
-            element.id === todo.id
-                ? { ...element, title: updatedTaskContent.title, details: updatedTaskContent.details }
-                : element
-        );
-        setTask(updatedTask);
-        setEditDialog(false);
-        localStorage.setItem("Task", JSON.stringify(updatedTask));
-    }
 
     return (
         <>
-            <Dialog
-                style={{ direction: "rtl" }}
-                onClose={handleCloseDeleteDialog}
-                open={deleteDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"هل أنت متأكد من حذف المهمة ؟"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description"
-                        style={{ color: "red", fontSize: "13px" }}
-                    >
-                        لا يمكن استعادة المهمة بمجرد حذفها
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDeleteDialog}>إغلاق</Button>
-                    <Button autoFocus onClick={deleteConfirm}>نعم</Button>
-                </DialogActions>
-            </Dialog>
 
-            <Dialog
-                open={editDialog}
-                onClose={handleCloseEditDialog}
-            >
-                <DialogTitle style={{ direction: "rtl" }}>تعديل المهمة</DialogTitle>
-                <DialogContent style={{ direction: "rtl" }}>
-                    <TextField
-                        autoFocus
-                        required
-                        margin="dense"
-                        label="العنوان"
-                        type="text"
-                        fullWidth
-                        variant="standard"
-                        value={updatedTaskContent.title}
-                        onChange={(event) => {
-                            setUpdatedTaskContent({ ...updatedTaskContent, title: event.target.value })
-                        }}
-                    />
-                    <TextField
-                        autoFocus
-                        required
-                        margin="dense"
-                        label="التفاصيل"
-                        type="text"
-                        fullWidth
-                        variant="standard"
-                        value={updatedTaskContent.details}
-                        onChange={(event) => {
-                            setUpdatedTaskContent({ ...updatedTaskContent, details: event.target.value });
-                        }}
-                    />
-                </DialogContent>
-                <DialogActions style={{ direction: "rtl" }}>
-                    <Button onClick={handleCloseEditDialog}>إلغاء</Button>
-                    <Button onClick={handleUpdatedTask}>تعديل</Button>
-                </DialogActions>
-            </Dialog>
 
             <Card sx={{
                 minWidth: 275,
@@ -206,7 +115,7 @@ export default function ToDo({ todo }) {
                                     alignItems="center"
                                     style={{ width: "40px", height: "40px" }}
                                 >
-                                    {/* cehck button */}
+                                    {/* check button */}
                                     <IconButton
                                         onClick={handleCheckClick}
                                         className="iconButton"
