@@ -129,7 +129,6 @@ export default function ToDoList() {
 
         showToast("تم حفظ التعديلات بنجاح");
     }
-
     // END HANDLERS
 
     const tasksJSX = tasksToBeRendered.map((task) => {
@@ -151,7 +150,7 @@ export default function ToDoList() {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description"
-                        style={{ color: "red", fontSize: "13px" }}
+                        style={{ color: "red", fontSize: "14px" }}
                     >
                         لا يمكن استعادة المهمة بمجرد حذفها
                     </DialogContentText>
