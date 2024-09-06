@@ -89,7 +89,7 @@ export default function ToDoList() {
         setTask(updatedTask);
         localStorage.setItem("Task", JSON.stringify(updatedTask));
         showToast("تمت إضافة المهمة بنجاح");
-        }
+    }
 
     function handleCloseDeleteDialog() {
         setDeleteDialog(false);
