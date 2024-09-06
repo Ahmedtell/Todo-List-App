@@ -3,7 +3,8 @@ import ToDoList from './components/ToDoList';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { TodosContext } from './contexts/TodosContext';
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import MySnackBar from './components/MySnackBar';
+import { ToastContext } from './contexts/ToastContext';
 
 const theme = createTheme({
   typography: {
@@ -16,24 +17,25 @@ const theme = createTheme({
   },
 });
 
+
 function App() {
   const [task, setTask] = useState([]);
-
-  function handleAddClick(titleInput) {
-    const newTask = {
-      id: uuidv4(),
-      title: titleInput,
-      details: "",
-      completed: false,
-      important: false,
-    }
-    const updatedTask = [...task, newTask];
-    setTask(updatedTask);
-    localStorage.setItem("Task", JSON.stringify(updatedTask));
+  const [open, setOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  
+  function showToast(toastMessage){
+    setOpen(true);
+    setToastMessage(toastMessage);
+    setTimeout(() => {
+      setOpen(false);
+    }, 2000);
   }
 
   return (
     <ThemeProvider theme={theme}>
+      <ToastContext.Provider
+      value={{showToast}}
+      >
       <div className="App"
         style={{
           direction: "rtl",
@@ -44,15 +46,17 @@ function App() {
           alignItems: "center",
         }}
       >
+        <MySnackBar open={open} toastMessage={toastMessage} />
         <TodosContext.Provider
           value={{
             task: task,
             setTask: setTask,
           }}
         >
-          <ToDoList handleAdd={handleAddClick} />
+          <ToDoList />
         </TodosContext.Provider>
       </div>
+      </ToastContext.Provider>
     </ThemeProvider>
   );
 }

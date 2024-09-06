@@ -10,6 +10,8 @@ import Adding from '../AddTask';
 import { useContext, useEffect, useState, useMemo } from 'react';
 import { TodosContext } from '../contexts/TodosContext';
 import Button from '@mui/material/Button';
+import { v4 as uuidv4 } from 'uuid';
+import { ToastContext } from '../contexts/ToastContext';
 
 // DIALOG IMPORTS
 import Dialog from '@mui/material/Dialog';
@@ -20,8 +22,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 
 
-export default function ToDoList({ handleAdd }) {
-    const { task, setTask } = useContext(TodosContext);
+export default function ToDoList() {
+    const { task, setTask } = useContext(TodosContext); // Destructuring
+    const { showToast } = useContext(ToastContext); // Destructuring
     const [displayTaskType, setDisplayTaskType] = useState("all");
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [dialogTask, setDialogTask] = useState(null);
@@ -60,7 +63,6 @@ export default function ToDoList({ handleAdd }) {
         tasksToBeRendered = importantTasks;
     }
 
-
     useEffect(() => {
         console.log("calling useEffect");
         const storageTodos = JSON.parse(localStorage.getItem("Task")) ?? [];
@@ -74,6 +76,20 @@ export default function ToDoList({ handleAdd }) {
     function changeDisplayedType(event) {
         setDisplayTaskType(event.target.value);
     }
+
+    function handleAdd(titleInput) {
+        const newTask = {
+            id: uuidv4(),
+            title: titleInput,
+            details: "",
+            completed: false,
+            important: false,
+        }
+        const updatedTask = [...task, newTask];
+        setTask(updatedTask);
+        localStorage.setItem("Task", JSON.stringify(updatedTask));
+        showToast("تمت إضافة المهمة بنجاح");
+        }
 
     function handleCloseDeleteDialog() {
         setDeleteDialog(false);
@@ -94,6 +110,7 @@ export default function ToDoList({ handleAdd }) {
         setTask(updatedTasks);
         setDeleteDialog(false);
         localStorage.setItem("Task", JSON.stringify(updatedTasks));
+        showToast("تم حذف المهمة بنجاح")
     }
 
     function handleCloseEditDialog() {
@@ -109,6 +126,8 @@ export default function ToDoList({ handleAdd }) {
         setTask(updatedTask);
         setEditDialog(false);
         localStorage.setItem("Task", JSON.stringify(updatedTask));
+
+        showToast("تم حفظ التعديلات بنجاح");
     }
 
     // END HANDLERS
@@ -116,12 +135,10 @@ export default function ToDoList({ handleAdd }) {
     const tasksJSX = tasksToBeRendered.map((task) => {
         return (<ToDo key={task.id} todo={task} showDeleteDialog={openDeleteDialog} showEditClick={openEditDialog} />);
     });
-    
+
     return (
         <>
-
-
-        {/* Start Delete Dialog */}
+            {/* Start Delete Dialog */}
             <Dialog
                 style={{ direction: "rtl" }}
                 onClose={handleCloseDeleteDialog}
@@ -150,7 +167,7 @@ export default function ToDoList({ handleAdd }) {
             <Dialog
                 open={editDialog}
                 onClose={handleCloseEditDialog}
-                >
+            >
                 <DialogTitle style={{ direction: "rtl" }}>تعديل المهمة</DialogTitle>
                 <DialogContent style={{ direction: "rtl" }}>
                     <TextField
@@ -166,7 +183,7 @@ export default function ToDoList({ handleAdd }) {
                             setDialogTask({ ...dialogTask, title: event.target.value });
                         }}
                     />
-                    
+
                     <TextField
                         required
                         margin="dense"
@@ -178,14 +195,14 @@ export default function ToDoList({ handleAdd }) {
                         onChange={(event) => {
                             setDialogTask({ ...dialogTask, details: event.target.value });
                         }}
-                        />
+                    />
                 </DialogContent>
                 <DialogActions style={{ direction: "rtl" }}>
                     <Button onClick={handleCloseEditDialog}>إلغاء</Button>
-                    <Button onClick={handleUpdatedTask}>تعديل</Button>
+                    <Button onClick={handleUpdatedTask}>حفظ</Button>
                 </DialogActions>
             </Dialog>
-                {/* End Edit Dialog */}
+            {/* End Edit Dialog */}
 
             <Container maxWidth="sm">
                 <Card sx={{
@@ -222,8 +239,8 @@ export default function ToDoList({ handleAdd }) {
                         >
                             <ToggleButton value="not-completed">غير المنجزة</ToggleButton>
                             <ToggleButton value="completed">المنجزة</ToggleButton>
-                            <ToggleButton value="all">الكل</ToggleButton>
                             <ToggleButton value="important">المهمة</ToggleButton>
+                            <ToggleButton value="all">الكل</ToggleButton>
                         </ToggleButtonGroup>
                         {tasksJSX}
                         <Adding handleAddClick={handleAdd} />

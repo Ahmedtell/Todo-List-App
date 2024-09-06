@@ -10,35 +10,43 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import { useContext } from 'react';
 import { TodosContext } from '../contexts/TodosContext';
+import { ToastContext } from '../contexts/ToastContext';
 
 
 
 export default function ToDo({ todo, showDeleteDialog, showEditClick }) {
 
-
-    // const [updatedTaskContent, setUpdatedTaskContent] = useState({ title: todo.title, details: todo.details });
     const { task, setTask } = useContext(TodosContext);
+    const { showToast } = useContext(ToastContext);
 
+    // function to set task as done
     function handleCheckClick() {
         let updatedTask = task.map((element) => {
             if (element.id === todo.id) {
                 element.completed = !element.completed;
+                element.completed === true ? showToast("تم الإضافة الى قائمة المهام المنجزة") : 
+                showToast("تمت الإزالة من قائمة المهام المنجزة");
             }
-            return element;
+            return element; 
         });
         setTask(updatedTask);
         localStorage.setItem("Task", JSON.stringify(updatedTask));
     }
 
+    // function to set task as important
     function handleImportantTask() {
         let importantTask = task.map((element) => {
             if (element.id === todo.id) {
                 element.important = !element.important;
+                element.important ? showToast("تمت الإضافة إلى قائمة المهام المهة") :
+                showToast("تمت الإزالة من قائمة المهام المهمة");
             }
             return element;
         });
         setTask(importantTask);
         localStorage.setItem("Task", JSON.stringify(importantTask));
+        
+        
     }
 
 
@@ -50,12 +58,8 @@ export default function ToDo({ todo, showDeleteDialog, showEditClick }) {
         showEditClick(todo);
     }
 
-
-
     return (
         <>
-
-
             <Card sx={{
                 minWidth: 275,
                 backgroundColor: "#7b1fa2",
