@@ -7,11 +7,12 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ToDo from './ToDo';
 import Adding from '../AddTask';
-import { useContext, useEffect, useState, useMemo } from 'react';
-import { TodosContext } from '../contexts/TodosContext';
+import { useEffect, useState, useMemo } from 'react';
 import Button from '@mui/material/Button';
-import { v4 as uuidv4 } from 'uuid';
-import { ToastContext } from '../contexts/ToastContext';
+import { useTodos, useTodosDispatch } from "../contexts/TodosContext";
+import { useToast } from '../contexts/ToastContext';
+
+
 
 // DIALOG IMPORTS
 import Dialog from '@mui/material/Dialog';
@@ -22,13 +23,17 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 
 
+
 export default function ToDoList() {
-    const { task, setTask } = useContext(TodosContext); // Destructuring
-    const { showToast } = useContext(ToastContext); // Destructuring
+
+    const { task } = useTodos();
+    const { dispatch } = useTodosDispatch();
+    const { showToast } = useToast(); // Destructuring
     const [displayTaskType, setDisplayTaskType] = useState("all");
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [dialogTask, setDialogTask] = useState(null);
     const [editDialog, setEditDialog] = useState(false);
+
 
     const completedTasks = useMemo(() => {
         return task.filter((element) => {
@@ -64,12 +69,10 @@ export default function ToDoList() {
     }
 
     useEffect(() => {
-        console.log("calling useEffect");
-        const storageTodos = JSON.parse(localStorage.getItem("Task")) ?? [];
-        if (storageTodos) {
-            setTask(storageTodos);
-        }
-    }, [setTask]);
+        dispatch({
+            type: "get",
+        })
+    }, []);
 
     // START HANDLERS 
 
@@ -78,16 +81,13 @@ export default function ToDoList() {
     }
 
     function handleAdd(titleInput) {
-        const newTask = {
-            id: uuidv4(),
-            title: titleInput,
-            details: "",
-            completed: false,
-            important: false,
-        }
-        const updatedTask = [...task, newTask];
-        setTask(updatedTask);
-        localStorage.setItem("Task", JSON.stringify(updatedTask));
+        dispatch({
+            type: "added",
+            payload: {
+                newTitle: titleInput,
+
+            }
+        })
         showToast("تمت إضافة المهمة بنجاح");
     }
 
@@ -106,10 +106,11 @@ export default function ToDoList() {
     }
 
     function deleteConfirm() {
-        let updatedTasks = task.filter((element) => element.id !== dialogTask.id);
-        setTask(updatedTasks);
+        dispatch({
+            type: "deleted",
+            payload: dialogTask,
+        })
         setDeleteDialog(false);
-        localStorage.setItem("Task", JSON.stringify(updatedTasks));
         showToast("تم حذف المهمة بنجاح")
     }
 
@@ -118,15 +119,11 @@ export default function ToDoList() {
     }
 
     function handleUpdatedTask() {
-        let updatedTask = task.map((element) =>
-            element.id === dialogTask.id
-                ? { ...element, title: dialogTask.title, details: dialogTask.details }
-                : element
-        );
-        setTask(updatedTask);
+        dispatch({
+            type: "updated",
+            payload: dialogTask,
+        })
         setEditDialog(false);
-        localStorage.setItem("Task", JSON.stringify(updatedTask));
-
         showToast("تم حفظ التعديلات بنجاح");
     }
     // END HANDLERS
@@ -157,7 +154,7 @@ export default function ToDoList() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDeleteDialog}>إغلاق</Button>
-                    <Button autoFocus onClick={deleteConfirm}>نعم</Button>
+                    <Button autoFocus onClick={deleteConfirm}>حذف</Button>
                 </DialogActions>
             </Dialog>
             {/* End Delete Dialog */}
